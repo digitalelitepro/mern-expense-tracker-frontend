@@ -14,6 +14,7 @@ const navigate = useNavigate()
 
 const handleLogin = (e) => {
    e.preventDefault()
+ 
 
    if(!validateEmail(email))
    {
@@ -26,7 +27,13 @@ const handleLogin = (e) => {
      return ;
    }
 
+   if(password.length < 8) {
+    setError("Your password must contains 8 characters at least")
+    return ;
+   }
+
    setError("")
+   console.log({email, password})
    navigate('/dashboard')
    // Call Api to get Access
 
@@ -54,7 +61,7 @@ const handleLogin = (e) => {
               value={password}
               onChange={({target}) => setPassword(target.value)}
               label="Password "
-              placeholder="Password"
+              placeholder="Min 8 Characters "
               type="password"
              />
 
