@@ -4,17 +4,29 @@ import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/inputs/Input";
 import { validateEmail } from "../../utils/helpers";
 import ProfilePhotoSelector from "../../components/inputs/ProfilePhotoSelector";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
+import { useAuth } from "../../context/userContext";
+import { LuFoldVertical } from "react-icons/lu";
+import uploadImage from "../../utils/uploadImage";
+
+
 
 const SignUp = () => {
-  const [profilePic, setProfilePic] = useState(null);
+  
+  let profileImageUrl = ""
+  // const [profilePic, setProfilePic] = useState(null);
+  const [profilePic, setProfilePic] = useState("uploads/default.png");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const  {user, setUser} = useAuth()
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if(!fullName){
       setError("Please, provide full name ")
@@ -30,11 +42,44 @@ const SignUp = () => {
       return ;
     }
 
-    if(password.length < 8){
+    if(password.length < 6){
       setError('Your password must be in 8 characters at least')
-    }
-
+    } 
     console.log({fullName, email, password, profilePic})
+
+    try {
+
+       if(profilePic){
+          const imgUploadRes = await uploadImage(profilePic)
+          profileImageUrl = imgUploadRes.data.data.imageUrl || ''
+       }
+
+       console.log(profileImageUrl)
+
+        const response  = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+          fullName,
+          email,
+          password,
+          profileImageUrl
+        })
+
+        console.log(response)
+
+        if(response.data.success){
+           const {token} = response.data.data
+           setUser(response.data.data)
+           localStorage.setItem('accessToken', token )
+           console.log(response.data.data)
+           navigate('/dashboard')
+        }else{
+          return ;
+        }
+
+    } catch (error) {
+        if(error.response && error.response.data.message){ 
+            setError(error.response.data.message)
+        } 
+    }
   };
 
   return <AuthLayout>
@@ -47,7 +92,7 @@ const SignUp = () => {
 
                   <form onSubmit={handleSubmit}>
 
-                  <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} /> 
+                      <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} /> 
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                            <Input  

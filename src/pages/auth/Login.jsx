@@ -4,15 +4,20 @@ import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/inputs/Input";
 
 import { validateEmail } from "../../utils/helpers";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths"; 
+import { useAuth } from "../../context/userContext";
 
 const Login = () => {
 const [email , setEmail] = useState("")
 const [password , setPassword] = useState("")
 const [error , setError] = useState(null)
 
+const {user, setUser} = useAuth()
+
 const navigate = useNavigate()
 
-const handleLogin = (e) => {
+const handleLogin = async (e) => {
    e.preventDefault()
  
 
@@ -27,15 +32,42 @@ const handleLogin = (e) => {
      return ;
    }
 
-   if(password.length < 8) {
+   if(password.length < 6) {
     setError("Your password must contains 8 characters at least")
     return ;
    }
 
-   setError("")
    console.log({email, password})
-   navigate('/dashboard')
-   // Call Api to get Access
+   try {
+       // Call Api to get Access
+          const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
+            email,
+            password
+        })
+
+        // console.log(response.data)
+
+        if(response.data.success){
+          const user =  response.data.data
+          const {token } = user
+          
+          if(token){
+              localStorage.setItem('accessToken', token)
+              setUser(user)
+              navigate('/dashboard')
+          } 
+        }else{
+          return ;
+        }
+        //  console.log(response.data.data.token)
+        //  console.log(response.data.data)
+   } catch (error) {
+       if(error.response && error.response.data.data.message){
+          setError(error.response.data.data.message)
+       }else {
+          setError("Something went wrong .")
+       }
+   }
 
 }
 

@@ -16,8 +16,13 @@ const ProfilePhotoSelector = ({image, setImage}) => {
             setImage(file)
             //  Generate preview URL from the file
             const preview = URL.createObjectURL(file)
+            console.log(preview)
             setPreviewUrl(preview)
+            // console.log(previewUrl)
+
           }
+
+          //
           
     }
 
@@ -54,6 +59,7 @@ const ProfilePhotoSelector = ({image, setImage}) => {
                ) : 
                (
                   <div className="relative"> 
+                    { console.log("previewUrl : ",previewUrl )}
                     <img  src={previewUrl} alt="profile photo " className="w-20 h-20 rounded-full object-cover" /> 
                     <button type="button"  className="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-full absolute -bottom-1 -right-1"  onClick={handleRemoveImage} > 
                         <LuTrash />  

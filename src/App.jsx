@@ -11,9 +11,10 @@ import SignUp from "./pages/auth/SignUp";
 import Income from "./pages/dashboard/Income";
 import Expense from "./pages/dashboard/Expense";
 import Home from "./pages/dashboard/Home";
-
+ 
 const App = () => {
   return (
+    
     <div>
       <Router>
         <Routes>
@@ -26,6 +27,7 @@ const App = () => {
         </Routes>
       </Router>
     </div>
+     
   );
 };
 
@@ -35,7 +37,7 @@ export default App;
 const Root = () => {
   
   // Check If Token Exists in LocalStorage
-  const isAuthenticated = !!localStorage.getItem('token')
+  const isAuthenticated = !!localStorage.getItem('accessToken')
   // Redirect to dashboard if authenticated ,  otherwise to login 
   return <>
        {
